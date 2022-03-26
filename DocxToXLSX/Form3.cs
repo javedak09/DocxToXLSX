@@ -186,6 +186,7 @@ namespace DocxToXLSX
                             new Package { Company = arr[9] },
                             new Package { Company = arr[10] },
                             new Package { Company = arr[11] }
+
                         };
 
 

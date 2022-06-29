@@ -117,7 +117,176 @@ namespace DocxToXLSX
         }
 
 
+
         static void CreateExcelFile(string filePath, string content)
+        {
+            using (SpreadsheetDocument spreedDoc = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
+            {
+                WorkbookPart wbPart = spreedDoc.WorkbookPart;
+                if (wbPart == null)
+                {
+                    wbPart = spreedDoc.AddWorkbookPart();
+                    wbPart.Workbook = new Workbook();
+                }
+
+                string sheetName = "Sheet1";
+                WorksheetPart worksheetPart = null;
+                worksheetPart = wbPart.AddNewPart<WorksheetPart>();
+                var sheetData = new SheetData();
+
+                worksheetPart.Worksheet = new Worksheet(sheetData);
+
+                if (wbPart.Workbook.Sheets == null)
+                {
+                    wbPart.Workbook.AppendChild<Sheets>(new Sheets());
+                }
+
+                var sheet = new Sheet()
+                {
+                    Id = wbPart.GetIdOfPart(worksheetPart),
+                    SheetId = 1,
+                    Name = sheetName
+                };
+
+                var workingSheet = ((WorksheetPart)wbPart.GetPartById(sheet.Id)).Worksheet;
+
+
+                var arr = content.Split('*');
+
+                int rowindex = 1;
+
+
+                if (arr[5].IndexOf('#') != -1)
+                {
+                    string[] arr_hash = arr[5].Split('#');
+                    arr[5] = arr_hash[0] + ":" + arr_hash[1];
+                }
+
+
+                if (arr[6].IndexOf('#') != -1)
+                {
+                    string[] arr_hash = arr[6].Split('#');
+                    arr[6] = arr_hash[0] + ":" + arr_hash[1];
+                }
+
+
+
+                if (arr[7].IndexOf(';') != -1)
+                {
+                    string[] arr_hash = arr[7].Split(';');
+                    arr[7] = arr_hash[0] + ":" + arr_hash[1];
+                }
+
+
+
+
+                if (arr[9].IndexOf(';') != -1)
+                {
+                    string[] arr_hash = arr[9].Split(';');
+                    arr[9] = arr_hash[0] + ":" + arr_hash[1];
+                }
+
+
+
+
+
+                for (int a = 0; a <= arr.Length - 1; a++)
+                {
+
+                    Row row = new Row();
+                    row.RowIndex = (UInt32)rowindex;
+
+                    if (rowindex == 1) //Header
+                    {
+                        //row.AppendChild(AddCellWithText1("Name"));
+                        //row.AppendChild(AddCellWithText1("Email"));
+                    }
+                    else //Data
+                    {
+
+                        List<Package> packages = new List<Package>
+                        {
+                            new Package { Company = arr[0] },
+                            new Package { Company = arr[1] },
+                            new Package { Company = arr[2] },
+                            new Package { Company = arr[3] },
+                            new Package { Company = arr[4] },
+                            new Package { Company = arr[5] },
+                            new Package { Company = arr[6] },
+                            new Package { Company = arr[7] },
+                            new Package { Company = arr[8] },
+                            new Package { Company = arr[9] },
+                            new Package { Company = arr[10] },
+                            new Package { Company = arr[11] }
+
+                        };
+
+
+
+
+                        List<Package.ResultTable> lst_result = new List<Package.ResultTable>
+                        {
+                            new Package.ResultTable { NormalRange = arr[12], NormalRangeValue = arr[13] },
+                            new Package.ResultTable { NormalRange = arr[14], NormalRangeValue = arr[15] }
+                        };
+
+
+
+
+
+                        List<string> headerNames = new List<string> { "" };
+
+                        //ExcelFacade excelFacade = new ExcelFacade();
+
+                        ExcelFacadeNew excelFacade = new ExcelFacadeNew();
+                        excelFacade.Create<Package>(Application.StartupPath + @"\output1.xlsx", packages, "LabReport", headerNames);
+
+
+
+                        //javed      row.AppendChild(AddCellWithText1(arr[a]));
+                    }
+
+                    sheetData.AppendChild(row);
+                    rowindex++;
+
+                }
+
+
+
+
+                //int rowindex = 1;
+                //foreach (var emp in lstEmps)
+                //{
+                //    Row row = new Row();
+                //    row.RowIndex = (UInt32)rowindex;
+
+                //    if (rowindex == 1) //Header
+                //    {
+                //        row.AppendChild(AddCellWithText1("Name"));
+                //        row.AppendChild(AddCellWithText1("Email"));
+                //    }
+                //    else //Data
+                //    {
+                //        row.AppendChild(AddCellWithText1("safsdfsd"));
+                //        row.AppendChild(AddCellWithText1("sdfsdfsd"));
+                //    }
+
+                //    sheetData.AppendChild(row);
+                //    rowindex++;
+                //}
+
+                wbPart.Workbook.Sheets.AppendChild(sheet);
+
+                //Set Border
+                //wbPark
+
+                wbPart.Workbook.Save();
+            }
+        }
+
+
+
+        static void CreateExcelFile_old(string filePath, string content)
         {
             using (SpreadsheetDocument spreedDoc = SpreadsheetDocument.Create(filePath, SpreadsheetDocumentType.Workbook))
             {
@@ -190,11 +359,22 @@ namespace DocxToXLSX
                         };
 
 
+                        List<Package.ResultTable> lst_result = new List<Package.ResultTable>
+                        {
+                            new Package.ResultTable { NormalRange = arr[12], NormalRangeValue = arr[13] },
+                            new Package.ResultTable { NormalRange = arr[14], NormalRangeValue = arr[15] }
+                        };
 
-                        List<string> headerNames = new List<string> { "Company" };
+
+                        //var test = packages;
+
+
+
+                        List<string> headerNames = new List<string> { "" };
 
                         ExcelFacade excelFacade = new ExcelFacade();
-                        excelFacade.Create<Package>(Application.StartupPath + @"\output1.xlsx", packages, "Packages", headerNames);
+                        excelFacade.Create<Package>(Application.StartupPath + @"\output1.xlsx", packages, "LabReport", headerNames);
+
 
 
                         //javed      row.AppendChild(AddCellWithText1(arr[a]));
@@ -349,6 +529,15 @@ namespace DocxToXLSX
     public class Package
     {
         public string Company { get; set; }
+
+        public class ResultTable
+        {
+            public string NormalRange { get; set; }
+            public string NormalRangeValue { get; set; }
+            public string Result { get; set; }
+            public string ResultValue { get; set; }
+        }
+
     }
 
 
@@ -368,6 +557,8 @@ namespace DocxToXLSX
         public long TrackingNumber { get; set; }
         public DateTime DateOrder { get; set; }
         public bool HasCompleted { get; set; }
+
+
     }
 
 

@@ -57,6 +57,7 @@
     <Compile Include="CustomStylesheet.cs" />
     <Compile Include="DataCell.cs" />
     <Compile Include="Excel.cs" />
+    <Compile Include="ExcelFacadeNew.cs" />
     <Compile Include="ExcelFacade.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

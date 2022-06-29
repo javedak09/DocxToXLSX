@@ -98,7 +98,7 @@ namespace DocxToXLSX
             borders.Count = UInt32Value.FromUInt32((uint)borders.ChildElements.Count);
 
             CellStyleFormats csfs = new CellStyleFormats();
-            CellFormat cf = new CellFormat();
+            CellFormat cf = new CellFormat();            
             cf.NumberFormatId = 0;
             cf.FontId = 0;
             cf.FillId = 0;

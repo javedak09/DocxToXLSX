@@ -13,7 +13,7 @@ using System.Data;
 
 namespace DocxToXLSX
 {
-    public class ExcelFacade
+    public class ExcelFacadeNew
     {
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace DocxToXLSX
                 Worksheet worksheet = new Worksheet();
 
                 int numCols = headerNames.Count;
-                int width = headerNames.Max(h => h.Length) + 5;
+                int width = headerNames.Max(h => h.Length) + 15;
 
                 Columns columns = new Columns();
                 for (int col = 0; col < numCols; col++)
@@ -82,11 +82,11 @@ namespace DocxToXLSX
 
         private void UpdateExcel(string path)
         {
-            
-        }
-        
 
-                
+        }
+
+
+
 
 
         private SheetData CreateSheetData<T>(List<T> objects, List<string> headerNames, WorkbookStylesPart stylesPart)
@@ -126,20 +126,40 @@ namespace DocxToXLSX
                         PropertyInfo myf = obj1.GetType().GetProperty(fieldName);
                         if (myf != null)
                         {
+                            string[] arr;
+
+
                             object obj = myf.GetValue(obj1, null);
+
                             if (obj != null)
                             {
                                 if (obj.GetType() == typeof(string))
                                 {
-                                    // Cell c = CreateTextCell(headers[col].ToString(), obj.ToString(), index);
-                                    TextCell c = new TextCell(headers[col].ToString(), obj.ToString(), index);
-                                    r.Append(c);
+
+                                    if (obj.ToString().IndexOf(':') != -1)
+                                    {
+                                        arr = obj.ToString().Split(':');
+
+                                        Cell c = CreateTextCell(headers[col].ToString(), arr[0] + ":", index);
+                                        Cell c1 = CreateTextCell("B", arr[1], index);
+
+                                        r.Append(c);
+                                        r.Append(c1);
+                                    }
+                                    else
+                                    {
+                                        Cell c = CreateTextCell(headers[col].ToString(), obj.ToString(), index);
+                                        r.Append(c);
+                                    }
+
+                                    //TextCell c = new TextCell(headers[col].ToString(), obj.ToString(), index);
+                                    //r.Append(c);                                    
                                 }
                                 else if (obj.GetType() == typeof(bool))
                                 {
                                     string value = (bool)obj ? "Yes" : "No";
-                                    //Cell c = CreateTextCell(headers[col].ToString(), value, index);
-                                    TextCell c = new TextCell(headers[col].ToString(), value, index);
+                                    Cell c = CreateTextCell(headers[col].ToString(), value, index);
+                                    //TextCell c = new TextCell(headers[col].ToString(), value, index);
                                     r.Append(c);
                                 }
                                 else if (obj.GetType() == typeof(DateTime))
@@ -148,14 +168,14 @@ namespace DocxToXLSX
                                     string value = ((DateTime)obj).ToOADate().ToString();
 
                                     // stylesPart.Stylesheet is retrieved reference for the appropriate worksheet.
-                                    //Cell c = CreateDateCell(headers[col].ToString(), value, index, stylesPart.Stylesheet);
-                                    DateCell c = new DateCell(headers[col].ToString(), (DateTime)obj, index);
+                                    Cell c = CreateDateCell(headers[col].ToString(), value, index, stylesPart.Stylesheet);
+                                    //DateCell c = new DateCell(headers[col].ToString(), (DateTime)obj, index);
                                     r.Append(c);
                                 }
                                 else if (obj.GetType() == typeof(decimal) || obj.GetType() == typeof(double))
                                 {
-                                    //Cell c = CreateDecimalCell(headers[col].ToString(), obj.ToString(), index, stylesPart.Stylesheet);
-                                    FormatedNumberCell c = new FormatedNumberCell(headers[col].ToString(), obj.ToString(), index);
+                                    Cell c = CreateDecimalCell(headers[col].ToString(), obj.ToString(), index, stylesPart.Stylesheet);
+                                    //FormatedNumberCell c = new FormatedNumberCell(headers[col].ToString(), obj.ToString(), index);
                                     r.Append(c);
                                 }
                                 else
@@ -163,14 +183,14 @@ namespace DocxToXLSX
                                     long value;
                                     if (long.TryParse(obj.ToString(), out value))
                                     {
-                                        //Cell c = CreateIntegerCell(headers[col].ToString(), obj.ToString(), index);
-                                        NumberCell c = new NumberCell(headers[col].ToString(), obj.ToString(), index);
+                                        Cell c = CreateIntegerCell(headers[col].ToString(), obj.ToString(), index);
+                                        //NumberCell c = new NumberCell(headers[col].ToString(), obj.ToString(), index);
                                         r.Append(c);
                                     }
                                     else
                                     {
-                                        //Cell c = CreateTextCell(headers[col].ToString(), obj.ToString(), index);
-                                        TextCell c = new TextCell(headers[col].ToString(), obj.ToString(), index);
+                                        Cell c = CreateTextCell(headers[col].ToString(), obj.ToString(), index);
+                                        //TextCell c = new TextCell(headers[col].ToString(), obj.ToString(), index);
 
                                         r.Append(c);
                                     }
@@ -634,7 +654,8 @@ namespace DocxToXLSX
             column.Min = startColumnIndex;
             column.Max = endColumnIndex;
             column.Width = columnWidth;
-            column.CustomWidth = true;
+            column.CustomWidth = true;            
+
             return column;
         }
 
